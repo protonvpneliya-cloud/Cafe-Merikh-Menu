@@ -1,0 +1,714 @@
+<!doctype html>
+<html lang="fa" dir="rtl"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#050716">
+<title>مریخ | منوی کافه</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap');
+*{box-sizing:border-box}
+html,body{margin:0;scroll-behavior:smooth;min-height:100%;overflow-x:hidden;background:#02030b;color:#f7eee8;font-family:Vazirmatn,Tahoma,sans-serif}
+body{min-height:100vh;overflow-x:hidden}
+body:before{
+  content:"";position:fixed;inset:0;z-index:-3;
+  background:
+   radial-gradient(circle at 80% 12%,rgba(209,91,42,.18),transparent 18%),
+   radial-gradient(circle at 12% 35%,rgba(54,73,170,.20),transparent 24%),
+   radial-gradient(circle at 55% 70%,rgba(123,55,34,.15),transparent 26%),
+   linear-gradient(180deg,#050716 0%,#090b25 48%,#140a0b 100%);
+}
+.wrap{width:min(100%,720px);margin:auto;padding:10px 14px 54px}
+.section{margin:14px 0}
+.title{display:flex;align-items:center;gap:8px;margin:0 0 12px;color:#e7a06c;font-size:19px;font-weight:800}
+.title:after{content:"";height:1px;flex:1;background:linear-gradient(90deg,rgba(219,125,71,.55),transparent)}
+.hero{position:relative;margin:8px 0 12px;padding:10px 14px;border-radius:18px;background:linear-gradient(90deg,rgba(125,42,25,.16),rgba(25,31,78,.20));border:1px solid rgba(207,118,70,.22);display:grid;grid-template-columns:1fr auto 1fr;align-items:center;overflow:hidden;min-height:64px}
+.astronaut{position:absolute;top:50%;transform:translateY(-50%);font-size:36px;line-height:1;filter:drop-shadow(0 0 10px rgba(255,170,90,.22));animation:astronautFloat 3.2s ease-in-out infinite}.astronaut.left{left:calc(50% - 118px)}.astronaut.right{right:calc(50% - 118px);animation-delay:-1.6s}
+.hero-copy{grid-column:2;text-align:center;white-space:nowrap}
+.hero strong{display:block;color:#f0c2a0;font-size:15px;font-weight:800}
+.hero span{display:none}
+@keyframes astronautFloat{0%,100%{transform:translateY(-50%) rotate(-2deg)}50%{transform:translateY(calc(-50% - 5px)) rotate(2deg)}}
+.card{position:relative;overflow:hidden;border:1px solid rgba(255,185,132,.25);background:linear-gradient(145deg,rgba(24,29,62,.055),rgba(8,12,34,.035));border-radius:28px;padding:15px 14px;box-shadow:0 8px 22px rgba(0,0,0,.20),inset 0 1px 0 rgba(255,255,255,.07)}
+.card:before{content:"";position:absolute;width:90px;height:90px;border-radius:50%;left:-45px;top:-45px;background:rgba(80,111,210,.08)}
+.grid{display:grid;grid-template-columns:1fr;gap:12px}
+.grid2{display:grid;grid-template-columns:1fr;gap:12px}
+.item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 2px;border-bottom:1px dashed rgba(207,190,179,.17)}
+.item:last-child{border-bottom:0}
+.name{font-size:14px;font-weight:500}
+.price{color:#f0d6c4;font-size:13px;white-space:nowrap}
+.placeholder{opacity:.55}
+
+/* Hot coffee: single/double pricing per blend */
+.hot-coffee-table{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+.hot-coffee-table .coffee-head,.hot-coffee-table .coffee-row{min-width:520px;grid-template-columns:1.35fr repeat(4,1fr)}
+.hot-coffee-table .blend-head{display:flex;flex-direction:column;gap:3px;text-align:center;align-items:stretch}
+.hot-coffee-table .blend-head .blend-name{font-size:10px}
+.hot-coffee-table .sd{display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:8px;opacity:.75;letter-spacing:0;text-align:center}
+.hot-coffee-table .sd span{display:block}
+.hot-coffee-table .blend-prices{display:flex;justify-content:center;gap:8px;align-items:center}
+.hot-coffee-table .blend-prices .p{min-width:24px}
+.hot-coffee-table .sd-label{font-size:8px;opacity:.65;display:block}
+@media(max-width:420px){.hot-coffee-table .coffee-head,.hot-coffee-table .coffee-row{min-width:500px}.hot-coffee-table .blend-prices{gap:5px}.hot-coffee-table .coffee-row .p{font-size:10px}}
+
+.coffee-head,.coffee-row{display:grid;grid-template-columns:1.45fr repeat(4,1fr);gap:5px;align-items:center}
+.coffee-head{color:#8fb2c2;font-size:10px;padding:0 0 7px;border-bottom:1px solid rgba(213,126,76,.28)}
+.coffee-row{padding:9px 0;border-bottom:1px dashed rgba(207,190,179,.14)}
+.coffee-row:last-child{border-bottom:0}
+.coffee-row .name{font-size:13px}
+.coffee-row .p{text-align:center;font-size:12px;color:#e8d0c0}
+/* Cold coffee: header and every row use the EXACT same six-column geometry: thumb | item | Robusta | 70/30 | 50/50 | Arabica */
+.card[data-category="cold-coffee"] .coffee-head,
+.card[data-category="cold-coffee"] .coffee-row{
+  grid-template-columns:52px 1.45fr repeat(4,1fr);
+  min-width:520px;
+}
+.card[data-category="cold-coffee"] .coffee-row .p{
+  text-align:center;
+  justify-self:center;
+  width:100%;
+}
+.card[data-category="cold-coffee"] .coffee-head > div{
+  text-align:center;
+}
+.card[data-category="cold-coffee"] .coffee-head > div:nth-child(2){
+  text-align:right;
+}
+
+/* Coffee recipe notes: full-width inside the main section, not a small nested card */
+.coffee-notes{margin:14px -14px -15px !important;padding:15px 14px 16px !important;border:0 !important;border-top:1px solid rgba(213,126,76,.22) !important;border-radius:0 !important;background:transparent !important;box-shadow:none !important}
+.coffee-notes .title{margin-top:0}
+@media(max-width:430px){
+.card[data-category="cold-coffee"] .coffee-head,
+.card[data-category="cold-coffee"] .coffee-row{
+  grid-template-columns:46px 1.45fr repeat(4,.8fr);
+  min-width:500px;
+}
+.card[data-category="cold-coffee"] .coffee-row .p{justify-self:center;width:100%;}
+.coffee-notes{margin-left:-10px !important;margin-right:-10px !important;padding-left:10px !important;padding-right:10px !important}
+}
+.note{font-size:11px;line-height:2;color:#b8b0b0;margin:4px 0 0}
+.mars{height:105px;margin:18px -14px -54px;position:relative;overflow:hidden}
+.mars:before{content:"";position:absolute;left:-8%;right:-8%;bottom:-82px;height:150px;border-radius:50% 50% 0 0/70% 70% 0 0;background:linear-gradient(180deg,#7b321e,#36130f);box-shadow:0 -18px 40px rgba(190,73,37,.12)}
+footer{text-align:center;color:#77778b;font-size:10px;margin-top:20px}
+
+.categories{
+  position:sticky;top:0;z-index:20;display:flex;gap:8px;overflow-x:auto;
+  padding:10px 2px 12px;margin:0 -2px 8px;background:rgba(5,8,24,.48);
+  
+  scrollbar-width:none
+}
+.categories::-webkit-scrollbar{display:none}
+.cat{
+  flex:0 0 auto;border:1px solid rgba(218,128,72,.28);background:rgba(13,16,42,.9);
+  color:#bdb9c7;border-radius:999px;padding:8px 14px;will-change:transform;font:600 11px Vazirmatn,Tahoma,sans-serif;
+  transition:.25s;cursor:pointer
+}
+.cat.active,.cat:active{
+  color:#fff1e7;border-color:rgba(235,142,79,.8);
+  background:linear-gradient(135deg,rgba(151,54,27,.75),rgba(45,34,75,.9));
+  box-shadow:0 0 18px rgba(224,100,48,.22)
+}
+.card.category-focus{animation:categoryPulse .55s ease}
+@keyframes categoryPulse{0%{transform:translateY(6px);opacity:.65}100%{transform:translateY(0);opacity:1}}
+.card.category-hidden{display:none}
+.card.category-focus{}
+
+
+/* --- 3D product experience --- */
+.card{
+  transition:box-shadow .22s ease,border-color .22s ease;
+}
+.card:hover{box-shadow:0 14px 30px rgba(0,0,0,.25),0 0 16px rgba(209,83,38,.06)}
+.product{
+  position:relative;display:flex;align-items:center;gap:9px;transform-style:preserve-3d;
+}
+.item.product{min-height:64px}
+.thumb{
+  width:50px;height:50px;flex:0 0 50px;border-radius:14px;
+  display:grid;place-items:center;position:relative;overflow:hidden;
+  background:
+    radial-gradient(circle at 30% 22%,rgba(255,255,255,.24),transparent 20%),
+    linear-gradient(145deg,rgba(82,87,150,.48),rgba(110,39,28,.45));
+  border:1px solid rgba(232,151,99,.35);
+  box-shadow:inset 3px 3px 8px rgba(255,255,255,.07),inset -5px -5px 12px rgba(0,0,0,.28),0 8px 18px rgba(0,0,0,.25);
+  transform:translateZ(8px);
+}
+.thumb:before{
+  content:"";position:absolute;inset:5px;border-radius:11px;
+  background:linear-gradient(135deg,rgba(255,255,255,.12),transparent 38%,rgba(0,0,0,.18));
+  pointer-events:none
+}
+.drink-icon{
+  font-size:27px;filter:drop-shadow(0 5px 5px rgba(0,0,0,.35));
+  transform:translateZ(10px);display:block
+}
+.coffee-row.product{
+  grid-template-columns:52px 1.45fr repeat(4,1fr);
+  display:grid;padding-top:8px;padding-bottom:8px
+}
+.coffee-row.product .thumb{grid-column:1}
+.coffee-row.product .name{grid-column:2}
+.coffee-row.product .p{text-align:center}
+@media(max-width:430px){
+ .thumb{width:44px;height:44px;flex-basis:44px;border-radius:12px}
+ .drink-icon{font-size:24px}
+ .coffee-row.product{grid-template-columns:46px 1.45fr repeat(4,.8fr)}
+ .coffee-row.product .p{font-size:10px}
+}
+
+@media(max-width:430px){
+ .wrap{padding-left:10px;padding-right:10px}
+ .grid2{gap:8px}
+ .card{padding:13px 10px}
+ .coffee-head,.coffee-row{grid-template-columns:1.5fr repeat(4,.8fr)}
+ .coffee-head{font-size:8px}
+ .coffee-row .name{font-size:11px}
+ .coffee-row .p{font-size:10px}
+ h1{font-size:38px}
+}
+
+#starfield{
+  position:fixed;inset:0;width:100%;height:100%;z-index:0;
+  pointer-events:none;display:block;opacity:.72
+}
+.space-glow{
+  position:fixed;inset:-15%;z-index:-1;pointer-events:none;
+  background:
+   radial-gradient(circle at 82% 12%,rgba(211,84,35,.18),transparent 20%),
+   radial-gradient(circle at 14% 44%,rgba(53,76,190,.16),transparent 26%),
+   radial-gradient(circle at 58% 82%,rgba(121,48,30,.14),transparent 24%);
+  
+}
+@keyframes spacePulse{from{transform:scale(1);opacity:.8}to{transform:scale(1.04);opacity:1}}
+
+
+/* Final glass + mobile polish */
+.wrap{position:relative;z-index:1;padding-top:max(18px,env(safe-area-inset-top))}
+.card:after{
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(135deg,rgba(255,255,255,.08),transparent 28%,transparent 70%,rgba(255,132,76,.035));
+  opacity:.7;
+}
+
+
+.site-end{
+  position:relative;margin:22px 0 0;padding:28px 16px 38px;text-align:center;
+  border-radius:30px 30px 14px 14px;
+  border:1px solid rgba(255,181,133,.18);
+  background:linear-gradient(180deg,rgba(8,11,30,.10),rgba(8,8,18,.24));
+  
+  box-shadow:0 -10px 35px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.06);
+  overflow:hidden
+}
+.site-end:before,.site-end:after{
+  content:"✦ · ✧ · ✦ · ✧ · ✦ · ✧ · ✦ · ✧ · ✦ · ✧ · ✦ · ✧ · ✦ · ✧ · ";
+  position:absolute;left:0;width:200%;color:rgba(255,239,220,.72);
+  font-size:11px;letter-spacing:8px;white-space:nowrap;will-change:transform;
+  animation:endStars 16s linear infinite;
+}
+.site-end:before{top:9px}
+.site-end:after{bottom:9px;animation-duration:22s;animation-direction:normal;opacity:.5}
+.end-orbit{position:absolute;left:50%;top:30px;width:190px;height:62px;transform:translateX(-50%);border:1px solid rgba(236,147,93,.20);border-radius:50%;animation:orbitTilt 6s ease-in-out infinite}
+.end-orbit span{position:absolute;width:4px;height:4px;border-radius:50%;background:#fff;box-shadow:0 0 8px #fff}
+.end-orbit span:nth-child(1){left:12%;top:48%}.end-orbit span:nth-child(2){right:13%;top:28%}.end-orbit span:nth-child(3){left:48%;bottom:-2px}
+.end-logo{font-size:34px;position:relative;z-index:1;margin-top:18px;filter:drop-shadow(0 0 12px rgba(234,129,70,.35))}
+.site-end strong,.site-end small{display:block;position:relative;z-index:1}
+.site-end strong{color:#e8b08d;font-size:13px;margin-top:7px}
+.site-end small{color:#777b99;font-size:9px;letter-spacing:2px;margin-top:5px}
+@keyframes endStars{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes orbitTilt{50%{transform:translateX(-50%) rotateX(18deg) rotateZ(3deg)}}
+
+
+/* Price editor */
+.admin-btn{position:fixed;right:12px;bottom:14px;z-index:60;border:1px solid rgba(238,151,91,.55);background:rgba(18,20,45,.94);color:#ffe8d7;border-radius:999px;padding:10px 14px;font:700 11px Vazirmatn,Tahoma,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.35);cursor:pointer}
+.admin-panel{position:fixed;inset:0;z-index:70;background:rgba(1,3,12,.78);backdrop-filter:blur(5px);display:none;align-items:flex-end;justify-content:center}
+.admin-panel.open{display:flex}
+.admin-box{width:min(720px,100%);max-height:88vh;overflow:auto;background:#0b0e25;border:1px solid rgba(239,148,91,.35);border-radius:26px 26px 0 0;padding:18px 14px 26px;box-shadow:0 -15px 45px rgba(0,0,0,.45)}
+.admin-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}.admin-top h3{margin:0;color:#f1bd98;font-size:18px}.admin-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.admin-actions button{border:1px solid rgba(239,148,91,.35);background:#151936;color:#f8e8dc;border-radius:12px;padding:10px 12px;font:600 11px Vazirmatn}.admin-actions .save{background:linear-gradient(135deg,#9b4828,#4a2d4b)}
+.edit-section{margin:10px 0;padding:12px;border:1px solid rgba(255,185,132,.15);border-radius:16px;background:rgba(255,255,255,.025)}.edit-section h4{margin:0 0 9px;color:#e6a67b;font-size:14px}.edit-head small{font-size:8px;opacity:.7;font-weight:500}.edit-row{display:grid;grid-template-columns:minmax(120px,1fr) repeat(4,76px);gap:6px;align-items:center;margin:5px 0}.edit-row.simple{grid-template-columns:minmax(120px,1fr) 96px}.edit-row label{font-size:11px;color:#eee}.edit-row input{width:100%;min-width:0;border:1px solid rgba(220,150,110,.22);background:#070a18;color:#fff;border-radius:9px;padding:8px;font:500 11px Vazirmatn;text-align:center}.edit-head{font-size:9px;color:#8fb2c2;text-align:center}.url-box{display:grid;grid-template-columns:1fr;gap:7px;margin-top:10px}.url-box input{width:100%;border:1px solid rgba(220,150,110,.22);background:#070a18;color:#fff;border-radius:10px;padding:10px;font:500 12px Vazirmatn;direction:ltr}.qr-preview{display:none;text-align:center;margin-top:10px;padding:10px;background:#fff;border-radius:14px}.qr-preview img{width:180px;height:180px;max-width:100%;display:block;margin:auto}.admin-note{font-size:10px;line-height:1.9;color:#aaa6b0;margin:8px 0}.close-admin{border:0;background:transparent;color:#aaa;font-size:22px;cursor:pointer}
+@media(max-width:520px){.edit-row{grid-template-columns:minmax(110px,1fr) repeat(4,58px)}.edit-row.simple{grid-template-columns:minmax(110px,1fr) 82px}.admin-box{padding-bottom:30px}}
+
+
+/* v23: exact single/double column alignment */
+.hot-coffee-table .coffee-head,.hot-coffee-table .coffee-row{
+  min-width:560px;
+  grid-template-columns:46px 1.45fr repeat(4,.8fr);
+  gap:5px;
+}
+.hot-coffee-table .blend-head{
+  display:grid;
+  grid-template-rows:auto auto;
+  gap:4px;
+  text-align:center;
+  align-items:stretch;
+}
+.hot-coffee-table .blend-head .blend-name{
+  grid-column:1;
+  font-size:10px;
+  line-height:1.2;
+}
+.hot-coffee-table .sd{
+  grid-column:1;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:0;
+  font-size:8px;
+  opacity:.75;
+  text-align:center;
+  width:100%;
+}
+.hot-coffee-table .sd span{display:block;text-align:center}
+.hot-coffee-table .blend-prices{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:0;
+  align-items:center;
+  width:100%;
+}
+.hot-coffee-table .blend-prices .p{
+  min-width:0;
+  width:100%;
+  text-align:center;
+  box-sizing:border-box;
+}
+
+
+/* v26: cold coffee keeps all four blends visible and vertically aligned */
+.card[data-category="cold-coffee"] .coffee-head,
+.card[data-category="cold-coffee"] .coffee-row.product{
+  min-width:0 !important;
+  width:100%;
+  box-sizing:border-box;
+  grid-template-columns:1.45fr repeat(4,1fr) !important;
+  gap:5px;
+  position:relative;
+}
+.card[data-category="cold-coffee"] .coffee-head > div:first-child{display:none;}
+.card[data-category="cold-coffee"] .coffee-head > div:nth-child(2){grid-column:1;text-align:right;}
+.card[data-category="cold-coffee"] .coffee-row.product .thumb{
+  position:absolute;
+  right:0;
+  top:50%;
+  transform:translateY(-50%);
+  width:42px;
+  height:42px;
+  z-index:2;
+}
+.card[data-category="cold-coffee"] .coffee-row.product .name{
+  grid-column:1;
+  padding-right:50px;
+  box-sizing:border-box;
+  text-align:right;
+  min-width:0;
+}
+.card[data-category="cold-coffee"] .coffee-row.product .p{
+  grid-column:auto;
+  min-width:0;
+  width:100%;
+  justify-self:stretch;
+  text-align:center;
+}
+@media(max-width:430px){
+  .card[data-category="cold-coffee"] .coffee-head,
+  .card[data-category="cold-coffee"] .coffee-row.product{
+    min-width:0 !important;
+    grid-template-columns:1.35fr repeat(4,1fr) !important;
+    gap:4px;
+  }
+  .card[data-category="cold-coffee"] .coffee-row.product .name{padding-right:46px;font-size:11px;}
+  .card[data-category="cold-coffee"] .coffee-row.product .thumb{width:40px;height:40px;}
+  .card[data-category="cold-coffee"] .coffee-head{font-size:9px;}
+  .card[data-category="cold-coffee"] .coffee-row.product .p{font-size:10px;}
+}
+
+</style>
+</head>
+<body>
+<canvas id="starfield" aria-hidden="true" width="450" height="910" style="width: 360px; height: 728px;"></canvas><div class="space-glow"></div>
+<div class="wrap">
+<div class="hero">
+  <div class="astronaut left" aria-hidden="true">👩‍🚀</div>
+  <div class="hero-copy"><strong>به مریخ خوش آمدید 🚀</strong></div>
+  <div class="astronaut right" aria-hidden="true">👨‍🚀</div>
+</div>
+<nav class="categories" aria-label="دسته‌بندی منو">
+  <button class="cat active" data-target="all">همه</button>
+  <button class="cat" data-target="hot-coffee">قهوه گرم</button>
+  <button class="cat" data-target="cold-coffee">قهوه سرد</button>
+  <button class="cat" data-target="hot-drink">نوشیدنی گرم</button>
+  <button class="cat" data-target="ice">آیس</button>
+  <button class="cat" data-target="shake">شیک</button>
+  <button class="cat" data-target="frappe">فراپه</button>
+  <button class="cat" data-target="mocktail">ماکتل</button>
+  <button class="cat" data-target="detox">دمنوش</button>
+  <button class="cat" data-target="smoothie">اسموتی</button>
+  <button class="cat" data-target="icetea">آیس‌تی</button>
+</nav>
+
+
+<section class="section card category-focus" data-category="hot-coffee">
+<h2 class="title">☕ قهوه گرم</h2>
+
+<div class="hot-coffee-table"><div class="coffee-head"><div></div><div>آیتم</div><div class="blend-head"><span class="blend-name">روبوستا</span><span class="sd"><span>سینگل</span><span>دبل</span></span></div><div class="blend-head"><span class="blend-name">70/30</span><span class="sd"><span>سینگل</span><span>دبل</span></span></div><div class="blend-head"><span class="blend-name">50/50</span><span class="sd"><span>سینگل</span><span>دبل</span></span></div><div class="blend-head"><span class="blend-name">عربیکا</span><span class="sd"><span>سینگل</span><span>دبل</span></span></div></div>
+<div class="coffee-row product" data-name="اسپرسو">
+      <div class="thumb"><span class="drink-icon">☕</span></div>
+      <div class="name">اسپرسو</div>
+      <div class="blend-prices"><div class="p">110</div><div class="p">90</div></div>
+      <div class="blend-prices"><div class="p">—</div><div class="p">—</div></div>
+      <div class="blend-prices"><div class="p">90</div><div class="p">90</div></div>
+      <div class="blend-prices"><div class="p">—</div><div class="p">—</div></div>
+    </div><div class="coffee-row product" data-name="آمریکانو">
+      <div class="thumb"><span class="drink-icon">☕</span></div>
+      <div class="name">آمریکانو</div>
+      <div class="blend-prices"><div class="p">—</div><div class="p">—</div></div>
+      <div class="blend-prices"><div class="p">—</div><div class="p">—</div></div>
+      <div class="blend-prices"><div class="p">—</div><div class="p">—</div></div>
+      <div class="blend-prices"><div class="p">—</div><div class="p">—</div></div>
+    </div><div class="coffee-row product" data-name="کورتادو">
+      <div class="thumb"><span class="drink-icon">☕</span></div>
+      <div class="name">کورتادو</div>
+      <div class="blend-prices"><div class="p">—</div><div class="p">—</div></div>
+      <div class="blend-prices"><div class="p">—</div><div class="p">—</div></div>
+      <div class="blend-prices"><div class="p">—</div><div class="p">—</div></div>
+      <div class="blend-prices"><div class="p">—</div><div class="p">—</div></div>
+    </div><div class="coffee-row product" data-name="ماکیاتو">
+      <div class="thumb"><span class="drink-icon">☕</span></div>
+      <div class="name">ماکیاتو</div>
+      <div class="blend-prices"><div class="p">—</div><div class="p">—</div></div>
+      <div class="blend-prices"><div class="p">—</div><div class="p">—</div></div>
+      <div class="blend-prices"><div class="p">—</div><div class="p">—</div></div>
+      <div class="blend-prices"><div class="p">—</div><div class="p">—</div></div>
+    </div><div class="coffee-row product" data-name="کاپوچینو">
+      <div class="thumb"><span class="drink-icon">☕</span></div>
+      <div class="name">کاپوچینو</div>
+      <div class="blend-prices"><div class="p">—</div><div class="p">—</div></div>
+      <div class="blend-prices"><div class="p">—</div><div class="p">—</div></div>
+      <div class="blend-prices"><div class="p">—</div><div class="p">—</div></div>
+      <div class="blend-prices"><div class="p">—</div><div class="p">—</div></div>
+    </div><div class="coffee-row product" data-name="لاته">
+      <div class="thumb"><span class="drink-icon">☕</span></div>
+      <div class="name">لاته</div>
+      <div class="blend-prices"><div class="p">—</div><div class="p">—</div></div>
+      <div class="blend-prices"><div class="p">—</div><div class="p">—</div></div>
+      <div class="blend-prices"><div class="p">—</div><div class="p">—</div></div>
+      <div class="blend-prices"><div class="p">—</div><div class="p">—</div></div>
+    </div><div class="coffee-row product" data-name="فلت وایت">
+      <div class="thumb"><span class="drink-icon">☕</span></div>
+      <div class="name">فلت وایت</div>
+      <div class="blend-prices"><div class="p">—</div><div class="p">—</div></div>
+      <div class="blend-prices"><div class="p">—</div><div class="p">—</div></div>
+      <div class="blend-prices"><div class="p">—</div><div class="p">—</div></div>
+      <div class="blend-prices"><div class="p">—</div><div class="p">—</div></div>
+    </div><div class="coffee-row product" data-name="موکا">
+      <div class="thumb"><span class="drink-icon">☕</span></div>
+      <div class="name">موکا</div>
+      <div class="blend-prices"><div class="p">—</div><div class="p">—</div></div>
+      <div class="blend-prices"><div class="p">—</div><div class="p">—</div></div>
+      <div class="blend-prices"><div class="p">—</div><div class="p">—</div></div>
+      <div class="blend-prices"><div class="p">—</div><div class="p">—</div></div>
+    </div>
+<div class="coffee-notes" data-category="coffee-notes">
+<h2 class="title">☕ ترکیب قهوه</h2>
+<p class="note">روبوستا یعنی ۱۰۰٪ روبوستا</p>
+<p class="note">70/30 یعنی ۷۰٪ روبوستا + ۳۰٪ عربیکا</p>
+<p class="note">عربیکا یعنی ۱۰۰٪ عربیکا</p>
+<p class="note">هر شات اسپرسو: ۳۰ میل</p>
+</div>
+</div></section>
+
+<section class="section card category-focus" data-category="cold-coffee">
+<h2 class="title">🧊 قهوه سرد</h2>
+
+<div class="coffee-head"><div></div><div>آیتم</div><div>روبوستا</div><div>70/30</div><div>50/50</div><div>عربیکا</div></div>
+<div class="coffee-row product" data-name="آیس آمریکانو">
+      <div class="thumb"><span class="drink-icon">☕</span></div>
+      <div class="name">آیس آمریکانو</div><div class="p">—</div><div class="p">—</div><div class="p">—</div><div class="p">—</div>
+    </div><div class="coffee-row product" data-name="اسپرسو تونیک">
+      <div class="thumb"><span class="drink-icon">☕</span></div>
+      <div class="name">اسپرسو تونیک</div><div class="p">—</div><div class="p">—</div><div class="p">—</div><div class="p">—</div>
+    </div><div class="coffee-row product" data-name="آیس لاته">
+      <div class="thumb"><span class="drink-icon">☕</span></div>
+      <div class="name">آیس لاته</div><div class="p">—</div><div class="p">—</div><div class="p">—</div><div class="p">—</div>
+    </div><div class="coffee-row product" data-name="آیس موکا">
+      <div class="thumb"><span class="drink-icon">☕</span></div>
+      <div class="name">آیس موکا</div><div class="p">—</div><div class="p">—</div><div class="p">—</div><div class="p">—</div>
+    </div><div class="coffee-row product" data-name="آیس کارامل">
+      <div class="thumb"><span class="drink-icon">☕</span></div>
+      <div class="name">آیس کارامل</div><div class="p">—</div><div class="p">—</div><div class="p">—</div><div class="p">—</div>
+    </div><div class="coffee-row product" data-name="کلد برو">
+      <div class="thumb"><span class="drink-icon">☕</span></div>
+      <div class="name">کلد برو</div><div class="p">—</div><div class="p">—</div><div class="p">—</div><div class="p">—</div>
+    </div><div class="coffee-row product" data-name="آفوگاتو">
+      <div class="thumb"><span class="drink-icon">☕</span></div>
+      <div class="name">آفوگاتو</div><div class="p">—</div><div class="p">—</div><div class="p">—</div><div class="p">—</div>
+    </div><div class="coffee-row product" data-name="آیس ماکیاتو">
+      <div class="thumb"><span class="drink-icon">☕</span></div>
+      <div class="name">آیس ماکیاتو</div><div class="p">—</div><div class="p">—</div><div class="p">—</div><div class="p">—</div>
+    </div></section>
+
+<div class="grid2">
+<section class="card category-focus" data-category="hot-drink">
+<h2 class="title">🍵 نوشیدنی گرم</h2>
+<div class="item product" data-name="هات چاکلت"><span class="thumb"><span class="drink-icon">🍫</span></span><span class="name">هات چاکلت</span><span class="price">—</span></div>
+<div class="item product" data-name="وایت چاکلت"><span class="thumb"><span class="drink-icon">🤍</span></span><span class="name">وایت چاکلت</span><span class="price">—</span></div>
+<div class="item product" data-name="چای ماسالا"><span class="thumb"><span class="drink-icon">🍵</span></span><span class="name">چای ماسالا</span><span class="price">—</span></div>
+<div class="item product" data-name="چای کرک"><span class="thumb"><span class="drink-icon">🫖</span></span><span class="name">چای کرک</span><span class="price">—</span></div>
+<div class="item product" data-name="سیب دارچین"><span class="thumb"><span class="drink-icon">🍎</span></span><span class="name">سیب دارچین</span><span class="price">—</span></div>
+</section>
+
+<section class="card category-focus" data-category="ice">
+<h2 class="title">🧊 آیس</h2>
+<div class="item product" data-name="آیس چاکلت"><span class="thumb"><span class="drink-icon">🍫</span></span><span class="name">آیس چاکلت</span><span class="price">—</span></div>
+<div class="item product" data-name="آیس ماسالا"><span class="thumb"><span class="drink-icon">🧋</span></span><span class="name">آیس ماسالا</span><span class="price">—</span></div>
+<div class="item product" data-name="آیس کرک"><span class="thumb"><span class="drink-icon">🥤</span></span><span class="name">آیس کرک</span><span class="price">—</span></div>
+<div class="item product" data-name="آیس وایت چاکلت"><span class="thumb"><span class="drink-icon">🥛</span></span><span class="name">آیس وایت چاکلت</span><span class="price">—</span></div>
+<div class="item product" data-name="آیس تی"><span class="thumb"><span class="drink-icon">🍹</span></span><span class="name">آیس تی</span><span class="price">—</span></div>
+</section>
+
+<section class="card category-focus" data-category="shake">
+<h2 class="title">🥤 شیک</h2>
+<div class="item product" data-name="وانیل"><span class="thumb"><span class="drink-icon">🍦</span></span><span class="name">وانیل</span><span class="price">—</span></div>
+<div class="item product" data-name="شکلات"><span class="thumb"><span class="drink-icon">🍫</span></span><span class="name">شکلات</span><span class="price">—</span></div>
+<div class="item product" data-name="نوتلا"><span class="thumb"><span class="drink-icon">🍫</span></span><span class="name">نوتلا</span><span class="price">—</span></div>
+<div class="item product" data-name="کارامل"><span class="thumb"><span class="drink-icon">🍮</span></span><span class="name">کارامل</span><span class="price">—</span></div>
+<div class="item product" data-name="اورئو"><span class="thumb"><span class="drink-icon">🍪</span></span><span class="name">اورئو</span><span class="price">—</span></div>
+</section>
+
+<section class="card category-focus" data-category="frappe">
+<h2 class="title">🍹 فراپه</h2>
+<div class="item product" data-name="کلاسیک"><span class="thumb"><span class="drink-icon">🥤</span></span><span class="name">کلاسیک</span><span class="price">—</span></div>
+<div class="item product" data-name="کارامل"><span class="thumb"><span class="drink-icon">🍮</span></span><span class="name">کارامل</span><span class="price">—</span></div>
+<div class="item product" data-name="موکا"><span class="thumb"><span class="drink-icon">🍫</span></span><span class="name">موکا</span><span class="price">—</span></div>
+<div class="item product" data-name="شکلات"><span class="thumb"><span class="drink-icon">🍫</span></span><span class="name">شکلات</span><span class="price">—</span></div>
+</section>
+
+<section class="card category-focus" data-category="mocktail">
+<h2 class="title">🍓 ماکتل</h2>
+<div class="item product" data-name="رد بری"><span class="thumb"><span class="drink-icon">🍓</span></span><span class="name">رد بری</span><span class="price">—</span></div>
+<div class="item product" data-name="بلو اسکای"><span class="thumb"><span class="drink-icon">🫐</span></span><span class="name">بلو اسکای</span><span class="price">—</span></div>
+<div class="item product" data-name="رد موهیتو"><span class="thumb"><span class="drink-icon">🍒</span></span><span class="name">رد موهیتو</span><span class="price">—</span></div>
+<div class="item product" data-name="موهیتو"><span class="thumb"><span class="drink-icon">🍋</span></span><span class="name">موهیتو</span><span class="price">—</span></div>
+<div class="item product" data-name="لیموناد"><span class="thumb"><span class="drink-icon">🍋</span></span><span class="name">لیموناد</span><span class="price">—</span></div>
+</section>
+
+<section class="card category-focus" data-category="detox">
+<h2 class="title">🍵 دمنوش</h2>
+<div class="item product" data-name="چای ساده"><span class="thumb"><span class="drink-icon">🍵</span></span><span class="name">چای ساده</span><span class="price">—</span></div>
+<div class="item product" data-name="آرامش"><span class="thumb"><span class="drink-icon">🌿</span></span><span class="name">آرامش</span><span class="price">—</span></div>
+<div class="item product" data-name="بهار نارنج"><span class="thumb"><span class="drink-icon">🌼</span></span><span class="name">بهار نارنج</span><span class="price">—</span></div>
+<div class="item product" data-name="گل گاوزبان"><span class="thumb"><span class="drink-icon">🌸</span></span><span class="name">گل گاوزبان</span><span class="price">—</span></div>
+<div class="item product" data-name="میوه‌ای"><span class="thumb"><span class="drink-icon">🍹</span></span><span class="name">میوه‌ای</span><span class="price">—</span></div>
+</section>
+
+<section class="card category-focus" data-category="smoothie">
+<h2 class="title">🍓 اسموتی</h2>
+<div class="item product" data-name="توت فرنگی"><span class="thumb"><span class="drink-icon">🍓</span></span><span class="name">توت فرنگی</span><span class="price">—</span></div>
+<div class="item product" data-name="موز شکلات"><span class="thumb"><span class="drink-icon">🍌</span></span><span class="name">موز شکلات</span><span class="price">—</span></div>
+<div class="item product" data-name="انبه"><span class="thumb"><span class="drink-icon">🥭</span></span><span class="name">انبه</span><span class="price">—</span></div>
+<div class="item product" data-name="ملون"><span class="thumb"><span class="drink-icon">🍈</span></span><span class="name">ملون</span><span class="price">—</span></div>
+</section>
+
+<section class="card category-focus" data-category="icetea">
+<h2 class="title">🥤 آیس‌تی</h2>
+<div class="item product" data-name="آیس تی"><span class="thumb"><span class="drink-icon">🍹</span></span><span class="name">آیس تی</span><span class="price">—</span></div>
+</section>
+</div>
+
+<div class="site-end">
+  <div class="end-orbit"><span></span><span></span><span></span></div>
+  <div class="end-logo">🚀</div>
+  <strong>پایان سفر به مریخ</strong>
+  <small>MERIKH · TAKE AWAY COFFEE</small>
+</div>
+
+</div>
+
+
+
+
+
+
+
+
+<script>
+(() => {
+  const cats=[...document.querySelectorAll('.cat')], cards=[...document.querySelectorAll('.card[data-category]')];
+  function showCategory(key, doScroll=true){
+    cats.forEach(b=>b.classList.toggle('active',b.dataset.target===key));
+    cards.forEach(c=>{
+      const show=(key==='all') || c.dataset.category===key;
+      c.classList.toggle('category-hidden',!show);
+      if(show){c.classList.remove('category-focus');requestAnimationFrame(()=>c.classList.add('category-focus'));}
+    });
+    const first=key==='all' ? cards[0] : cards.find(c=>c.dataset.category===key);
+    if(first && doScroll) first.scrollIntoView({behavior:'auto',block:'start'});
+  }
+  cats.forEach(b=>b.addEventListener('click',()=>{showCategory(b.dataset.target); history.replaceState(null,'',location.pathname+location.search+(b.dataset.target==='all'?'':'#'+encodeURIComponent(b.dataset.target)));}));
+  showCategory('all',false);
+  const initialHash=decodeURIComponent(location.hash.replace(/^#/,'')).trim();
+  if(initialHash && cats.some(b=>b.dataset.target===initialHash)) showCategory(initialHash,false);
+  try{const initialCat=new URLSearchParams(window.location.search).get('cat');if(initialCat && cats.some(b=>b.dataset.target===initialCat)) showCategory(initialCat,false);}catch(e){}
+
+  const storageKey='merikh-menu-prices-v20';
+  const adminPanel=document.getElementById('adminPanel');
+  const editor=document.getElementById('priceEditor');
+  const data=[];
+  document.querySelectorAll('.card[data-category]').forEach(card=>{
+    if(card.dataset.category==='coffee-notes') return;
+    const title=card.querySelector('.title')?.textContent.trim()||'';
+    const rows=[];
+    card.querySelectorAll('.coffee-row').forEach(row=>rows.push({el:row,name:row.dataset.name,type:(card.dataset.category==='hot-coffee'?'coffee-hot':'coffee')}));
+    card.querySelectorAll('.item').forEach(row=>rows.push({el:row,name:row.dataset.name,type:'simple'}));
+    if(rows.length) data.push({card,title,rows});
+  });
+  let saved={};
+  try{saved=JSON.parse(localStorage.getItem(storageKey)||'{}')||{};}catch(e){saved={};}
+  const keyFor=(cat,name,col)=>cat+'|'+name+'|'+col;
+
+  // Price state can be embedded in the QR URL. This lets the QR open the
+  // exact menu version (including newly edited prices) instead of only the
+  // base page URL. The compact positional format keeps the QR payload small.
+  function orderedPriceState(obj){
+    const vals=[];
+    data.forEach(group=>group.rows.forEach(row=>{
+      const n=row.type==='coffee-hot'?8:(row.type==='coffee'?4:1);
+      for(let i=0;i<n;i++){
+        const k=keyFor(group.card.dataset.category,row.name,i);
+        vals.push((obj&&obj[k]!=null?String(obj[k]):'').trim());
+      }
+    }));
+    return vals;
+  }
+  function applyPriceStateString(raw){
+    if(!raw) return null;
+    try{
+      const vals=decodeURIComponent(raw).split(',');
+      const out={}; let ix=0;
+      data.forEach(group=>group.rows.forEach(row=>{
+        const n=row.type==='coffee-hot'?8:(row.type==='coffee'?4:1);
+        for(let i=0;i<n;i++){
+          const k=keyFor(group.card.dataset.category,row.name,i);
+          if(ix<vals.length && vals[ix]!=='' ) out[k]=vals[ix];
+          ix++;
+        }
+      }));
+      return out;
+    }catch(e){return null;}
+  }
+  try{
+    const params=new URLSearchParams(window.location.search);
+    const qrState=applyPriceStateString(params.get('m'));
+    if(qrState) saved=Object.assign({},saved,qrState);
+  }catch(e){}
+  function currentValue(row,col){
+    if(row.type==='coffee-hot') return row.el.querySelectorAll('.p')[col]?.textContent.trim()||'—';
+    if(row.type==='coffee') return row.el.querySelectorAll('.p')[col]?.textContent.trim()||'—';
+    return row.el.querySelector('.price')?.textContent.trim()||'—';
+  }
+  function applyValue(row,col,val){
+    if(row.type==='coffee-hot'){const el=row.el.querySelectorAll('.p')[col]; if(el) el.textContent=val||'—';}
+    else if(row.type==='coffee'){const el=row.el.querySelectorAll('.p')[col]; if(el) el.textContent=val||'—';}
+    else {const el=row.el.querySelector('.price'); if(el) el.textContent=val||'—';}
+  }
+  function renderEditor(){
+    editor.innerHTML='';
+    data.forEach(group=>{
+      const sec=document.createElement('div');sec.className='edit-section';
+      const h=document.createElement('h4');h.textContent=group.title;sec.appendChild(h);
+      if(group.rows[0]?.type==='coffee-hot' || group.rows[0]?.type==='coffee'){
+        const head=document.createElement('div');head.className='edit-row';head.innerHTML=group.rows[0]?.type==='coffee-hot'?'<span></span><span class="edit-head">روبوستا<br><small>سینگل | دبل</small></span><span class="edit-head">70/30<br><small>سینگل | دبل</small></span><span class="edit-head">50/50<br><small>سینگل | دبل</small></span><span class="edit-head">عربیکا<br><small>سینگل | دبل</small></span>':'<span></span><span class="edit-head">روبوستا</span><span class="edit-head">70/30</span><span class="edit-head">50/50</span><span class="edit-head">عربیکا</span>'; sec.appendChild(head);
+        group.rows.forEach(row=>{
+          const r=document.createElement('div');r.className='edit-row';
+          const label=document.createElement('label');label.textContent=row.name;r.appendChild(label);
+          for(let i=0;i<(group.rows[0]?.type==='coffee-hot'?8:4);i++){const inp=document.createElement('input');inp.type='text';inp.inputMode='numeric';inp.placeholder='—';inp.value=saved[keyFor(group.card.dataset.category,row.name,i)] ?? (currentValue(row,i)==='—'?'':currentValue(row,i));inp.dataset.cat=group.card.dataset.category;inp.dataset.name=row.name;inp.dataset.col=i;r.appendChild(inp);}
+          sec.appendChild(r);
+        });
+      }else{
+        group.rows.forEach(row=>{
+          const r=document.createElement('div');r.className='edit-row simple';
+          const label=document.createElement('label');label.textContent=row.name;r.appendChild(label);
+          const inp=document.createElement('input');inp.type='text';inp.inputMode='numeric';inp.placeholder='—';inp.value=saved[keyFor(group.card.dataset.category,row.name,0)] ?? (currentValue(row,0)==='—'?'':currentValue(row,0));inp.dataset.cat=group.card.dataset.category;inp.dataset.name=row.name;inp.dataset.col=0;r.appendChild(inp);sec.appendChild(r);
+        });
+      }
+      editor.appendChild(sec);
+    });
+  }
+  function collect(){const out={};editor.querySelectorAll('input[data-cat]').forEach(inp=>{out[keyFor(inp.dataset.cat,inp.dataset.name,inp.dataset.col)]=inp.value.trim()||'—';});return out;}
+  function applySaved(obj){data.forEach(group=>group.rows.forEach(row=>{const n=row.type==='coffee-hot'?8:(row.type==='coffee'?4:1);for(let i=0;i<n;i++){const k=keyFor(group.card.dataset.category,row.name,i);if(obj[k]!=null)applyValue(row,i,obj[k]);}}));}
+  renderEditor();applySaved(saved);
+  document.getElementById('adminOpen').addEventListener('click',()=>{renderEditor();adminPanel.classList.add('open');adminPanel.setAttribute('aria-hidden','false');});
+  document.getElementById('adminClose').addEventListener('click',()=>{adminPanel.classList.remove('open');adminPanel.setAttribute('aria-hidden','true');});
+  document.getElementById('savePrices').addEventListener('click',()=>{saved=collect();localStorage.setItem(storageKey,JSON.stringify(saved));applySaved(saved);alert('قیمت‌ها ذخیره شد ✅');});
+  document.getElementById('resetPrices').addEventListener('click',()=>{localStorage.removeItem(storageKey);saved={};document.querySelectorAll('.p,.price').forEach(e=>e.textContent='—');renderEditor();});
+  document.getElementById('exportHtml').addEventListener('click',()=>{
+    const obj=collect();applySaved(obj);localStorage.setItem(storageKey,JSON.stringify(obj));
+    const clone=document.documentElement.cloneNode(true);
+    clone.querySelectorAll('.admin-panel,.admin-btn').forEach(e=>e.remove());
+    const out='<!doctype html>\n'+clone.outerHTML;
+    const blob=new Blob([out],{type:'text/html;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='merikh-menu-final.html';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  });
+  // QR همیشه فقط آدرس اصلی سایت را می‌سازد؛ نه دسته‌بندی و نه قیمت‌ها داخل لینک QR قرار نمی‌گیرند.
+  function currentMenuUrl(){
+    const input=document.getElementById('siteUrl');
+    const page=window.location.href.split('#')[0].split('?')[0];
+    return (/^https?:$/i.test(window.location.protocol)) ? page : input.value.trim().split('#')[0].split('?')[0];
+  }
+  function qrUrl(){const u=currentMenuUrl();return u?'https://api.qrserver.com/v1/create-qr-code/?size=360x360&data='+encodeURIComponent(u):'';}
+  function syncCurrentUrl(){const input=document.getElementById('siteUrl');if(/^https?:$/i.test(window.location.protocol)){input.value=window.location.href.split('#')[0].split('?')[0];input.placeholder='آدرس اصلی سایت';}}
+  syncCurrentUrl();
+  function buildQr(){
+    // قیمت‌های فعلی ذخیره می‌شوند تا خروجی نهایی دقیقاً با قیمت‌های جدید ساخته شود.
+    const obj=collect();
+    saved=obj;
+    localStorage.setItem(storageKey,JSON.stringify(obj));
+    applySaved(obj);
+    const u=qrUrl();
+    if(!u){alert('برای ساخت QR، اول آدرس اصلی آنلاین منو را وارد کن یا فایل را روی سایت قرار بده.');return '';}
+    document.getElementById('qrImg').src=u;
+    document.getElementById('qrPreview').style.display='block';
+    return u;
+  }
+  document.getElementById('makeQr').addEventListener('click',()=>{buildQr();});
+  document.getElementById('openQr').addEventListener('click',()=>{const u=buildQr();if(u) window.open(u,'_blank','noopener');});
+})();
+</script>
+
+
+<script>
+(() => {
+  const c=document.getElementById('starfield');
+  const ctx=c.getContext('2d',{alpha:true});
+  let w=0,h=0,dpr=1,stars=[],raf=0,scrollY=0,last=0;
+  const count=52;
+  function resize(){
+    dpr=Math.min(window.devicePixelRatio||1,1.25);
+    w=innerWidth; h=innerHeight;
+    c.width=Math.floor(w*dpr); c.height=Math.floor(h*dpr);
+    c.style.width=w+'px'; c.style.height=h+'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    stars=Array.from({length:count},()=>({
+      x:Math.random()*w,y:Math.random()*h,z:.35+Math.random()*.65,
+      r:.45+Math.random()*.9,a:.3+Math.random()*.5,tw:Math.random()*6.28
+    }));
+  }
+  function draw(t){
+    raf=requestAnimationFrame(draw);
+    if(t-last<30) return;
+    last=t; ctx.clearRect(0,0,w,h);
+    const par=scrollY*.16;
+    for(const q of stars){
+      let y=(q.y+par*q.z+t*.008*q.z)%(h+10);
+      if(y<0)y+=h+10;
+      const tw=q.a*(.9+.1*Math.sin(t*.001+q.tw));
+      ctx.globalAlpha=tw; ctx.fillStyle='#fff';
+      ctx.beginPath(); ctx.arc(q.x,y,q.r,0,Math.PI*2); ctx.fill();
+    }
+    ctx.globalAlpha=1;
+  }
+  addEventListener('resize',resize,{passive:true});
+  addEventListener('scroll',()=>{scrollY=window.scrollY},{passive:true});
+  resize(); raf=requestAnimationFrame(draw);
+})();
+</script>
+
+
+</body></html>
